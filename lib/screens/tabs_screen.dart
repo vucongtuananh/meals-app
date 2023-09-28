@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/screens/categories_screen.dart';
 import 'package:meals_app/screens/meal_screen.dart';
 
@@ -18,9 +19,30 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  final List<Meal> _favoriteMeals = [];
+
+  void _showInforMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _toggleMealFavoriteStatus(Meal meal) {
+    final _isExisting = _favoriteMeals.contains(meal);
+    if (_isExisting) {
+      setState(() {
+        _favoriteMeals.remove(meal);
+        _showInforMessage("Meal is no longer a favorite!");
+      });
+    } else {
+      setState(() {
+        _favoriteMeals.add(meal);
+        _showInforMessage("Meal is marked as a favorite!!");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget activePage = const CategoriesScreen();
+    Widget activePage = CategoriesScreen(toggleMealFavoriteStatus: _toggleMealFavoriteStatus);
     /* 
       Lỗi ngu như con lợn của Tuấn Anh : 
       Widget activePage đặt ở bên ngoài 
@@ -30,7 +52,10 @@ class _TabsScreenState extends State<TabsScreen> {
     */
     String _pageTitle = "Categories";
     if (_pageSelectedIndex == 1) {
-      activePage = const MealScreen(meals: []);
+      activePage = MealScreen(
+        meals: _favoriteMeals,
+        toggleMealFavoriteStatus: _toggleMealFavoriteStatus,
+      );
       _pageTitle = "Favorite";
     }
     return Scaffold(
