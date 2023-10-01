@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/data/dummy_data.dart';
 import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/screens/categories_screen.dart';
+import 'package:meals_app/screens/filters_screen.dart';
 import 'package:meals_app/screens/meal_screen.dart';
 import 'package:meals_app/widgets/main_drawer.dart';
+
+const kInitialFilters = {
+  Filters.glutenFree: false,
+  Filters.lactoseFree: false,
+  Filters.vegetarian: false,
+  Filters.vegan: false,
+};
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -14,10 +23,24 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   int _pageSelectedIndex = 0;
 
+  Map<Filters, bool> _selectedFilters = kInitialFilters;
+
   void _selectPage(int index) {
     setState(() {
       _pageSelectedIndex = index;
     });
+  }
+
+  void _onSelectScreen(String identifier) async {
+    Navigator.of(context).pop();
+    if (identifier == "filters") {
+      final result = await Navigator.of(context).push<Map<Filters, bool>>(MaterialPageRoute(
+        builder: (context) => const FiltersScreen(),
+      ));
+      setState(() {
+        _selectedFilters = result ?? kInitialFilters;
+      });
+    }
   }
 
   final List<Meal> _favoriteMeals = [];
@@ -43,7 +66,19 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = CategoriesScreen(toggleMealFavoriteStatus: _toggleMealFavoriteStatus);
+    List<Meal> filterMeal = dummyMeals.where(
+      (meal) {
+        if (_selectedFilters[Filters.glutenFree]! && !meal.isGlutenFree) return false;
+        if (_selectedFilters[Filters.lactoseFree]! && !meal.isLactoseFree) return false;
+        if (_selectedFilters[Filters.vegetarian]! && !meal.isVegetarian) return false;
+        if (_selectedFilters[Filters.vegan]! && !meal.isVegan) return false;
+        return true;
+      },
+    ).toList();
+    Widget activePage = CategoriesScreen(
+      toggleMealFavoriteStatus: _toggleMealFavoriteStatus,
+      availableMeal: filterMeal,
+    );
     /* 
       Lỗi ngu như con lợn của Tuấn Anh : 
       Widget activePage đặt ở bên ngoài 
@@ -63,7 +98,7 @@ class _TabsScreenState extends State<TabsScreen> {
       appBar: AppBar(
         title: Text(_pageTitle),
       ),
-      drawer: const MainDrawer(),
+      drawer: MainDrawer(onSelectScreen: _onSelectScreen),
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,

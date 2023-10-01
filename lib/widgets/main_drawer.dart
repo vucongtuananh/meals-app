@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class MainDrawer extends StatelessWidget {
-  const MainDrawer({super.key});
+  const MainDrawer({super.key, required this.onSelectScreen});
+
+  final Function(String identifier) onSelectScreen;
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +13,8 @@ class MainDrawer extends StatelessWidget {
           DrawerHeader(
               decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
-                Theme.of(context).colorScheme.background,
-                Theme.of(context).colorScheme.background.withOpacity(0.8)
+                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.8)
               ], begin: Alignment.topLeft, end: Alignment.bottomRight)),
               child: Row(
                 children: [
@@ -26,10 +28,32 @@ class MainDrawer extends StatelessWidget {
                   Text(
                     "Cooking up!",
                     style:
-                        Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).colorScheme.primary),
+                        Theme.of(context).textTheme.titleLarge!.copyWith(color: Theme.of(context).colorScheme.primary),
                   )
                 ],
-              ))
+              )),
+          ListTile(
+            onTap: () {
+              onSelectScreen('meals');
+            },
+            leading: const Icon(Icons.restaurant),
+            title: Text(
+              "Meals",
+              style:
+                  Theme.of(context).textTheme.titleLarge!.copyWith(color: Theme.of(context).colorScheme.onBackground),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: Text(
+              "Filters",
+              style:
+                  Theme.of(context).textTheme.titleLarge!.copyWith(color: Theme.of(context).colorScheme.onBackground),
+            ),
+            onTap: () {
+              onSelectScreen('filters');
+            },
+          )
         ],
       ),
     );
