@@ -20,19 +20,22 @@ class MealScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text("There's nothing here",
-            style:
-                Theme.of(context).textTheme.headlineLarge!.copyWith(color: Theme.of(context).colorScheme.onBackground)),
-        const SizedBox(
-          height: 30,
-        ),
-        Text("Let's try another way !!!",
-            style:
-                Theme.of(context).textTheme.headlineLarge!.copyWith(color: Theme.of(context).colorScheme.onBackground)),
-      ],
+    Widget content = Center(
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("There's nothing here",
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onBackground)),
+          const SizedBox(height: 30),
+          Text("Let's try another way !!!",
+              style:
+                  Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).colorScheme.onBackground)),
+        ],
+      ),
     );
 
     if (meals.isNotEmpty) {
