@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals_app/models/meal.dart';
+import 'package:meals_app/providers/favorite_provider.dart';
 import 'package:meals_app/providers/meals_provider.dart';
 import 'package:meals_app/screens/categories_screen.dart';
 import 'package:meals_app/screens/filters_screen.dart';
@@ -46,27 +47,6 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     }
   }
 
-  final List<Meal> _favoriteMeals = [];
-
-  void _showInforMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _toggleMealFavoriteStatus(Meal meal) {
-    final _isExisting = _favoriteMeals.contains(meal);
-    if (_isExisting) {
-      setState(() {
-        _favoriteMeals.remove(meal);
-        _showInforMessage("Meal is no longer a favorite!");
-      });
-    } else {
-      setState(() {
-        _favoriteMeals.add(meal);
-        _showInforMessage("Meal is marked as a favorite!!");
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final meals = ref.watch(mealsProvider);
@@ -80,7 +60,6 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
       },
     ).toList();
     Widget activePage = CategoriesScreen(
-      toggleMealFavoriteStatus: _toggleMealFavoriteStatus,
       availableMeal: filterMeal,
     );
     /* 
@@ -92,9 +71,10 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     */
     String _pageTitle = "Categories";
     if (_pageSelectedIndex == 1) {
+      final favoriteMeals = ref.watch(favoriteMealProvider);
       activePage = MealScreen(
-        meals: _favoriteMeals,
-        toggleMealFavoriteStatus: _toggleMealFavoriteStatus,
+        //this I dont need create a new favorite screen, i can use the meal screen with different parameter meals!!
+        meals: favoriteMeals,
       );
       _pageTitle = "Favorite";
     }

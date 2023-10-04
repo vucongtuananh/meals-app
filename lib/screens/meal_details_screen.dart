@@ -1,18 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals_app/models/meal.dart';
+import 'package:meals_app/providers/favorite_provider.dart';
 
-class MealDetailsScreen extends StatelessWidget {
-  const MealDetailsScreen({super.key, required this.meal, required this.toggleMealFavoriteStatus});
+class MealDetailsScreen extends ConsumerWidget {
+  const MealDetailsScreen({super.key, required this.meal});
 
   final Meal meal;
-  final Function(Meal meal) toggleMealFavoriteStatus;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
-        actions: [IconButton(onPressed: () => toggleMealFavoriteStatus(meal), icon: const Icon(Icons.star))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                final wasAdded = ref.read(favoriteMealProvider.notifier).toggleMealFavoriteStatus(meal);
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(wasAdded ? "Meal is marked as a favorite!!" : "Meal is no longer a favorite!")));
+                //               void _toggleMealFavoriteStatus(Meal meal) {
+                //   final _isExisting = _favoriteMeals.contains(meal);
+                //   if (_isExisting) {
+                //     setState(() {
+                //       _favoriteMeals.remove(meal);
+                //       _showInforMessage("Meal is no longer a favorite!");
+                //     });
+                //   } else {
+                //     setState(() {
+                //       _favoriteMeals.add(meal);
+                //       _showInforMessage("Meal is marked as a favorite!!");
+                //     });
+                //   }
+                // }
+              },
+              icon: const Icon(Icons.star))
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
