@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/providers/favorite_provider.dart';
+import 'package:meals_app/providers/filter_provider.dart';
 import 'package:meals_app/providers/meals_provider.dart';
 import 'package:meals_app/screens/categories_screen.dart';
 import 'package:meals_app/screens/filters_screen.dart';
@@ -25,8 +26,6 @@ class TabsScreen extends ConsumerStatefulWidget {
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _pageSelectedIndex = 0;
 
-  Map<Filters, bool> _selectedFilters = kInitialFilters;
-
   void _selectPage(int index) {
     setState(() {
       _pageSelectedIndex = index;
@@ -36,26 +35,23 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   void _onSelectScreen(String identifier) async {
     Navigator.of(context).pop();
     if (identifier == "filters") {
-      final result = await Navigator.of(context).push<Map<Filters, bool>>(MaterialPageRoute(
-        builder: (context) => FiltersScreen(
-          currentFilters: _selectedFilters,
-        ),
+      await Navigator.of(context).push<Map<Filters, bool>>(MaterialPageRoute(
+        //this generic type of .push<Map<Filters,bool>> is values we take from the filter screen
+        builder: (context) => const FiltersScreen(),
       ));
-      setState(() {
-        _selectedFilters = result ?? kInitialFilters;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final filters = ref.watch(filterProvider);
     final meals = ref.watch(mealsProvider);
     List<Meal> filterMeal = meals.where(
       (meal) {
-        if (_selectedFilters[Filters.glutenFree]! && !meal.isGlutenFree) return false;
-        if (_selectedFilters[Filters.lactoseFree]! && !meal.isLactoseFree) return false;
-        if (_selectedFilters[Filters.vegetarian]! && !meal.isVegetarian) return false;
-        if (_selectedFilters[Filters.vegan]! && !meal.isVegan) return false;
+        if (filters[Filters.glutenFree]! && !meal.isGlutenFree) return false;
+        if (filters[Filters.lactoseFree]! && !meal.isLactoseFree) return false;
+        if (filters[Filters.vegetarian]! && !meal.isVegetarian) return false;
+        if (filters[Filters.vegan]! && !meal.isVegan) return false;
         return true;
       },
     ).toList();
@@ -69,18 +65,18 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         Khi chạy app, nó chỉ build những gì ở trong hàm build này thôi má!, nếu mày để ở ngoài hàm build thì nó sẽ mặc định chạy 1 cái đầu, xong không động đến widget nữa,
         nghĩa là cái activePage nó = CategoriesScreen đúng 1 phát đầu thôi, còn lại nó kh được set bằng cái gì khi _pageSelectedIndex = 1
     */
-    String _pageTitle = "Categories";
+    String pageTitle = "Categories";
     if (_pageSelectedIndex == 1) {
       final favoriteMeals = ref.watch(favoriteMealProvider);
       activePage = MealScreen(
         //this I dont need create a new favorite screen, i can use the meal screen with different parameter meals!!
         meals: favoriteMeals,
       );
-      _pageTitle = "Favorite";
+      pageTitle = "Favorite";
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pageTitle),
+        title: Text(pageTitle),
       ),
       drawer: MainDrawer(onSelectScreen: _onSelectScreen),
       body: activePage,
