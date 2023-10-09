@@ -22,4 +22,6 @@ class FavoriteMealsProvider extends StateNotifier<List<Meal>> {
 final favoriteMealProvider = StateNotifierProvider<FavoriteMealsProvider, List<Meal>>((ref) {
   return FavoriteMealsProvider();
 });
+
+
 //this StateNotifierProvider is used for change data like favorite list meal

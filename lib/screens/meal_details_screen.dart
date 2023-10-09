@@ -10,6 +10,9 @@ class MealDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final favoriteMeals = ref.watch(favoriteMealProvider);
+
+    final isFavorite = favoriteMeals.contains(meal);
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
@@ -20,22 +23,8 @@ class MealDetailsScreen extends ConsumerWidget {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(wasAdded ? "Meal is marked as a favorite!!" : "Meal is no longer a favorite!")));
-                //               void _toggleMealFavoriteStatus(Meal meal) {
-                //   final _isExisting = _favoriteMeals.contains(meal);
-                //   if (_isExisting) {
-                //     setState(() {
-                //       _favoriteMeals.remove(meal);
-                //       _showInforMessage("Meal is no longer a favorite!");
-                //     });
-                //   } else {
-                //     setState(() {
-                //       _favoriteMeals.add(meal);
-                //       _showInforMessage("Meal is marked as a favorite!!");
-                //     });
-                //   }
-                // }
               },
-              icon: const Icon(Icons.star))
+              icon: Icon(isFavorite ? Icons.star : Icons.star_border_outlined))
         ],
       ),
       body: SingleChildScrollView(
